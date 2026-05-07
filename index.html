@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#1a4a2e"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Kenari App"/>
+<title>🐦 Kenari Finance</title>
+<link rel="manifest" href="manifest.json"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --green-dark:#1a4a2e;
+  --green-mid:#2d7a4f;
+  --green-light:#4caf82;
+  --green-pale:#e8f5ee;
+  --gold:#f4a827;
+  --gold-pale:#fff8e8;
+  --red:#e05252;
+  --red-pale:#fdeaea;
+  --blue:#3b6fd4;
+  --blue-pale:#eaf0fb;
+  --bg:#f4f7f5;
+  --card:#ffffff;
+  --text:#1a2e24;
+  --text2:#5a7a66;
+  --border:#d4e8db;
+  --shadow:0 2px 16px rgba(26,74,46,.10);
+  --radius:16px;
+  --radius-sm:10px;
+  --nav-h:68px;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --mono:'Fira Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text)}
+
+/* ── LAYOUT ── */
+#app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;position:relative;background:var(--bg)}
+#header{background:var(--green-dark);color:#fff;padding:14px 18px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+#header .logo{font-size:24px;line-height:1}
+#header .title-wrap{flex:1}
+#header h1{font-size:16px;font-weight:800;letter-spacing:-.3px}
+#header .sub{font-size:11px;color:#a8d4b8;font-weight:500}
+#header .drive-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.2s}
+#header .drive-btn:active{transform:scale(.95)}
+#header .drive-btn.connected{background:rgba(76,175,130,.25);border-color:var(--green-light)}
+
+#main{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px calc(var(--nav-h) + 14px);scroll-behavior:smooth}
+#main::-webkit-scrollbar{width:3px}
+#main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:var(--nav-h);background:var(--card);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;padding:0 4px 6px;box-shadow:0 -4px 20px rgba(0,0,0,.08);z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;border:none;background:none;cursor:pointer;color:var(--text2);transition:.2s;border-radius:12px;margin:0 2px}
+.nav-btn .nav-icon{font-size:20px;transition:.2s}
+.nav-btn .nav-label{font-size:9.5px;font-weight:600;letter-spacing:.3px;transition:.2s}
+.nav-btn.active{color:var(--green-mid)}
+.nav-btn.active .nav-icon{transform:translateY(-2px)}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card-header{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.card-icon{font-size:20px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.card-icon.green{background:var(--green-pale)}
+.card-icon.gold{background:var(--gold-pale)}
+.card-icon.red{background:var(--red-pale)}
+.card-icon.blue{background:var(--blue-pale)}
+.card-title{font-size:14px;font-weight:700;color:var(--text)}
+.card-sub{font-size:11px;color:var(--text2)}
+
+/* ── FORM ELEMENTS ── */
+.form-row{margin-bottom:10px}
+.form-row label{display:block;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.inp{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;color:var(--text);background:#fff;transition:.2s;outline:none}
+.inp:focus{border-color:var(--green-mid);box-shadow:0 0 0 3px rgba(45,122,79,.12)}
+.inp[type=number]{font-family:var(--mono);text-align:right}
+.inp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.inp-group{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:.2s}
+.inp-group:focus-within{border-color:var(--green-mid);box-shadow:0 0 0 3px rgba(45,122,79,.12)}
+.inp-group .prefix{padding:10px 10px;background:var(--green-pale);font-size:12px;font-weight:700;color:var(--green-mid);white-space:nowrap}
+.inp-group input{flex:1;border:none;padding:10px 10px;font-family:var(--mono);font-size:14px;color:var(--text);outline:none;background:#fff;text-align:right;min-width:0}
+
+/* ── BUTTONS ── */
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:12px;border:none;border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:-.1px}
+.btn:active{transform:scale(.97)}
+.btn-green{background:var(--green-mid);color:#fff;box-shadow:0 3px 10px rgba(45,122,79,.3)}
+.btn-green:hover{background:var(--green-dark)}
+.btn-gold{background:var(--gold);color:#5a3a00;box-shadow:0 3px 10px rgba(244,168,39,.3)}
+.btn-outline{background:#fff;color:var(--green-mid);border:1.5px solid var(--green-mid)}
+.btn-red{background:var(--red-pale);color:var(--red);border:1.5px solid #f5c5c5}
+.btn-sm{padding:7px 14px;font-size:12px;width:auto;border-radius:8px}
+
+/* ── STAT CHIPS ── */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-chip{background:var(--card);border-radius:var(--radius-sm);padding:12px 14px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.stat-chip .s-label{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-chip .s-val{font-size:16px;font-weight:800;font-family:var(--mono);color:var(--text)}
+.stat-chip.green .s-val{color:var(--green-mid)}
+.stat-chip.red .s-val{color:var(--red)}
+.stat-chip.gold .s-val{color:var(--gold)}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;border-radius:var(--radius-sm);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--green-dark);color:#fff;padding:9px 8px;font-weight:700;text-align:center;white-space:nowrap}
+thead th:first-child{border-radius:var(--radius-sm) 0 0 0}
+thead th:last-child{border-radius:0 var(--radius-sm) 0 0}
+tbody tr{border-bottom:1px solid var(--border);transition:.15s}
+tbody tr:hover{background:var(--green-pale)}
+tbody tr:last-child{border-bottom:none}
+td{padding:9px 8px;text-align:right;vertical-align:middle;color:var(--text)}
+td:first-child{text-align:center;color:var(--text2);font-weight:600}
+td:nth-child(2){text-align:left;font-weight:600;color:var(--text)}
+.td-money{font-family:var(--mono);font-size:11.5px}
+tfoot td{background:var(--green-pale);font-weight:800;border-top:2px solid var(--green-mid);color:var(--green-dark)}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.badge-profit{background:#e3f5ec;color:#2d7a4f}
+.badge-loss{background:var(--red-pale);color:var(--red)}
+.badge-break{background:#fff3e0;color:#e67e22}
+
+/* ── MONTH SELECTOR ── */
+.month-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none}
+.month-scroll::-webkit-scrollbar{display:none}
+.month-chip{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;transition:.2s}
+.month-chip.active{background:var(--green-mid);color:#fff;border-color:var(--green-mid)}
+.month-chip:active{transform:scale(.94)}
+
+/* ── ITEM LIST ── */
+.item-list{display:flex;flex-direction:column;gap:6px}
+.item-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;align-items:center;gap:10px}
+.item-card .item-icon{font-size:18px;width:32px;text-align:center}
+.item-card .item-info{flex:1;min-width:0}
+.item-card .item-name{font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-card .item-sub{font-size:10px;color:var(--text2)}
+.item-card .item-amount{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);text-align:right;white-space:nowrap}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px}
+.sec-hdr h3{font-size:13px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.4px}
+
+/* ── MODAL OVERLAY ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex;animation:overlayIn .2s ease}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+.sheet-modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;padding:20px 18px 32px;animation:sheetUp .25s ease}
+@keyframes sheetUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sheet-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:16px;color:var(--text)}
+
+/* ── TOAST ── */
+#toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--green-dark);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:14px 0}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:32px 20px;color:var(--text2)}
+.empty .e-icon{font-size:40px;margin-bottom:8px}
+.empty p{font-size:13px;font-weight:600}
+
+/* ── DRIVE STATUS ── */
+.drive-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;margin-bottom:12px}
+.drive-status.ok{background:#e3f5ec;color:#2d7a4f}
+.drive-status.off{background:#f5f5f5;color:#888}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap{background:var(--border);border-radius:4px;height:6px;overflow:hidden;margin-top:6px}
+.progress-bar{height:100%;border-radius:4px;background:var(--green-light);transition:.4s}
+
+/* ── ROI DISPLAY ── */
+.roi-block{background:linear-gradient(135deg,var(--green-dark),var(--green-mid));border-radius:var(--radius);padding:18px;color:#fff;margin-bottom:12px}
+.roi-block .roi-label{font-size:11px;font-weight:700;opacity:.75;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.roi-block .roi-val{font-size:28px;font-weight:800;font-family:var(--mono)}
+.roi-block .roi-sub{font-size:11px;opacity:.7;margin-top:2px}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <div id="header">
+    <div class="logo">🐦</div>
+    <div class="title-wrap">
+      <h1>Kenari Finance</h1>
+      <div class="sub">Manajemen Keuangan Ternak</div>
+    </div>
+    <button class="drive-btn" id="driveBtn" onclick="handleDriveAuth()">
+      <span>☁️</span><span id="driveBtnTxt">Drive</span>
+    </button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+    <!-- DASHBOARD -->
+    <div id="screen-dashboard" class="screen active">
+      <div class="stats-grid">
+        <div class="stat-chip green"><div class="s-label">Modal Awal</div><div class="s-val" id="d-modal">Rp 0</div></div>
+        <div class="stat-chip gold"><div class="s-label">Total Jual</div><div class="s-val" id="d-jual">Rp 0</div></div>
+        <div class="stat-chip red"><div class="s-label">Total Keluar</div><div class="s-val" id="d-keluar">Rp 0</div></div>
+        <div class="stat-chip" id="d-chip-laba"><div class="s-label">Laba/Rugi</div><div class="s-val" id="d-laba">Rp 0</div></div>
+      </div>
+
+      <div class="roi-block">
+        <div class="roi-label">ROI (Return on Investment)</div>
+        <div class="roi-val" id="d-roi">0%</div>
+        <div class="roi-sub" id="d-roi-sub">Belum ada data penjualan</div>
+        <div class="progress-wrap" style="margin-top:10px"><div class="progress-bar" id="d-progress" style="width:0%"></div></div>
+      </div>
+
+      <div class="sec-hdr"><h3>📅 Ringkasan Per Bulan</h3></div>
+      <div class="tbl-wrap">
+        <table id="dash-table">
+          <thead><tr><th>Bln</th><th>Pengeluaran</th><th>Penjualan</th><th>Status</th></tr></thead>
+          <tbody id="dash-tbody"></tbody>
+          <tfoot><tr><td colspan="2" style="text-align:center">Total</td><td class="td-money" id="ft-jual">-</td><td></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- MODAL AWAL -->
+    <div id="screen-modal" class="screen">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon gold">💰</div>
+          <div><div class="card-title">Modal Awal Investasi</div><div class="card-sub">Isi sekali, simpan selamanya</div></div>
+        </div>
+        <div id="modal-items"></div>
+        <div class="divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+          <span style="font-size:13px;font-weight:700;color:var(--text2)">TOTAL MODAL</span>
+          <span style="font-size:18px;font-weight:800;font-family:var(--mono);color:var(--green-dark)" id="modal-total">Rp 0</span>
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="saveModal()">💾 Simpan Modal Awal</button>
+      <div style="height:8px"></div>
+      <button class="btn btn-outline" onclick="openDriveSync('modal')">☁️ Sync ke Google Drive</button>
+    </div>
+
+    <!-- PENGELUARAN -->
+    <div id="screen-pengeluaran" class="screen">
+      <div class="month-scroll" id="month-pen"></div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon red">💸</div>
+          <div><div class="card-title" id="pen-title">Pengeluaran</div><div class="card-sub">Catat semua biaya operasional</div></div>
+        </div>
+        <div id="pen-items"></div>
+        <div class="divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+          <span style="font-size:13px;font-weight:700;color:var(--text2)">TOTAL BULAN INI</span>
+          <span style="font-size:18px;font-weight:800;font-family:var(--mono);color:var(--red)" id="pen-total">Rp 0</span>
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="savePengeluaran()">💾 Simpan Pengeluaran</button>
+      <div style="height:8px"></div>
+      <button class="btn btn-outline" onclick="openDriveSync('pengeluaran')">☁️ Sync ke Google Drive</button>
+    </div>
+
+    <!-- PENJUALAN -->
+    <div id="screen-penjualan" class="screen">
+      <div class="month-scroll" id="month-jual"></div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon green">🛒</div>
+          <div><div class="card-title" id="jual-title">Penjualan</div><div class="card-sub">Catat semua hasil penjualan</div></div>
+        </div>
+        <div id="jual-items"></div>
+        <div class="divider"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+          <span style="font-size:13px;font-weight:700;color:var(--text2)">TOTAL BULAN INI</span>
+          <span style="font-size:18px;font-weight:800;font-family:var(--mono);color:var(--green-mid)" id="jual-total">Rp 0</span>
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="savePenjualan()">💾 Simpan Penjualan</button>
+      <div style="height:8px"></div>
+      <button class="btn btn-outline" onclick="openDriveSync('penjualan')">☁️ Sync ke Google Drive</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" data-screen="dashboard" onclick="gotoScreen('dashboard',this)">
+      <span class="nav-icon">📊</span><span class="nav-label">REKAP</span>
+    </button>
+    <button class="nav-btn" data-screen="modal" onclick="gotoScreen('modal',this)">
+      <span class="nav-icon">💰</span><span class="nav-label">MODAL</span>
+    </button>
+    <button class="nav-btn" data-screen="pengeluaran" onclick="gotoScreen('pengeluaran',this)">
+      <span class="nav-icon">💸</span><span class="nav-label">KELUAR</span>
+    </button>
+    <button class="nav-btn" data-screen="penjualan" onclick="gotoScreen('penjualan',this)">
+      <span class="nav-icon">🛒</span><span class="nav-label">JUAL</span>
+    </button>
+  </nav>
+</div>
+
+<!-- DRIVE MODAL -->
+<div class="overlay" id="driveOverlay" onclick="closeDriveModal(event)">
+  <div class="sheet-modal">
+    <div class="sheet-handle"></div>
+    <div class="modal-title">☁️ Google Drive Sync</div>
+    <div id="drive-content"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA DEFINITIONS
+// ═══════════════════════════════════════════════════════
+const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+const MODAL_ITEMS = [
+  {icon:'🐦',name:'Burung Kenari Jantan',unit:'ekor',defQty:5,defHarga:500000},
+  {icon:'🐦',name:'Burung Kenari Betina',unit:'ekor',defQty:5,defHarga:300000},
+  {icon:'🏠',name:'Sangkar Tunggal',unit:'buah',defQty:10,defHarga:150000},
+  {icon:'🏠',name:'Sangkar Koloni/Ternakan',unit:'buah',defQty:2,defHarga:350000},
+  {icon:'🍽️',name:'Tempat Makan & Minum',unit:'set',defQty:20,defHarga:25000},
+  {icon:'🛁',name:'Tempat Mandi Burung',unit:'buah',defQty:10,defHarga:15000},
+  {icon:'💡',name:'Lampu Penghangat',unit:'buah',defQty:2,defHarga:75000},
+  {icon:'🧴',name:'Peralatan Kebersihan',unit:'paket',defQty:1,defHarga:200000},
+];
+
+const PEN_ITEMS = [
+  {icon:'🌾',name:'Biji Kenari/Canary Seed',unit:'kg',defQty:2,defHarga:25000},
+  {icon:'🌾',name:'Biji Niger/Gingseng',unit:'kg',defQty:1,defHarga:30000},
+  {icon:'🌿',name:'Sayuran (Selada,Bayam,dll)',unit:'ikat',defQty:8,defHarga:5000},
+  {icon:'🥚',name:'Telur Rebus / EF',unit:'butir',defQty:20,defHarga:2000},
+  {icon:'🥚',name:'Telur Puyuh',unit:'butir',defQty:50,defHarga:500},
+  {icon:'💊',name:'Obat & Vitamin Umum',unit:'paket',defQty:1,defHarga:50000},
+  {icon:'💊',name:'Multivitamin Cair',unit:'botol',defQty:1,defHarga:35000},
+  {icon:'🧪',name:'Obat Khusus/Antibiotik',unit:'dosis',defQty:1,defHarga:30000},
+  {icon:'🧹',name:'Pasir/Alas Sangkar',unit:'kg',defQty:5,defHarga:10000},
+  {icon:'🧼',name:'Sabun/Disinfektan',unit:'botol',defQty:1,defHarga:15000},
+  {icon:'⚡',name:'Listrik (estimasi)',unit:'bulan',defQty:1,defHarga:50000},
+  {icon:'🔧',name:'Perawatan/Perbaikan',unit:'kali',defQty:1,defHarga:25000},
+];
+
+const JUAL_ITEMS = [
+  {icon:'🐦',name:'Anakan Jantan Muda',unit:'ekor',defQty:0,defHarga:150000},
+  {icon:'🐦',name:'Anakan Betina Muda',unit:'ekor',defQty:0,defHarga:100000},
+  {icon:'🎵',name:'Kenari Jantan Gacor',unit:'ekor',defQty:0,defHarga:400000},
+  {icon:'🐦',name:'Kenari Betina Dewasa',unit:'ekor',defQty:0,defHarga:200000},
+  {icon:'🥚',name:'Telur Infertil/Sisa',unit:'butir',defQty:0,defHarga:2000},
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE & STORAGE
+// ═══════════════════════════════════════════════════════
+let state = {
+  modal: {},
+  pengeluaran: {},   // {month: {items: [{qty,harga}]}}
+  penjualan: {},
+};
+let currentMonth = new Date().getMonth();
+let driveConnected = false;
+let driveAccessToken = null;
+
+function loadState(){
+  try{
+    const saved = localStorage.getItem('kenari_state');
+    if(saved) state = JSON.parse(saved);
+  }catch(e){}
+}
+function saveState(){
+  localStorage.setItem('kenari_state', JSON.stringify(state));
+}
+function getModalData(){return state.modal||{};}
+function getPenData(m){return (state.pengeluaran[m])||{items:[]};}
+function getJualData(m){return (state.penjualan[m])||{items:[]};}
+
+// ═══════════════════════════════════════════════════════
+// FORMATTING
+// ═══════════════════════════════════════════════════════
+function fmtRp(n){
+  n = Number(n)||0;
+  return 'Rp '+Math.abs(n).toLocaleString('id-ID');
+}
+function parseNum(s){return parseInt((s+'').replace(/\D/g,''))||0;}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function gotoScreen(name, btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='modal') renderModal();
+  if(name==='pengeluaran') renderPengeluaran();
+  if(name==='penjualan') renderPenjualan();
+  if(name==='dashboard') renderDashboard();
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL AWAL
+// ═══════════════════════════════════════════════════════
+function renderModal(){
+  const container = document.getElementById('modal-items');
+  const saved = getModalData();
+  let html = '';
+  MODAL_ITEMS.forEach((item,i)=>{
+    const qty   = saved.items ? (saved.items[i]||{}).qty   : item.defQty;
+    const harga = saved.items ? (saved.items[i]||{}).harga : item.defHarga;
+    html += `
+    <div class="form-row">
+      <label>${item.icon} ${item.name} [${item.unit}]</label>
+      <div class="inp-row">
+        <div class="inp-group"><span class="prefix">Qty</span><input type="number" class="m-qty" data-i="${i}" value="${qty}" min="0" oninput="recalcModal()"></div>
+        <div class="inp-group"><span class="prefix">Rp</span><input type="number" class="m-hrg" data-i="${i}" value="${harga}" min="0" oninput="recalcModal()"></div>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  recalcModal();
+}
+function recalcModal(){
+  let total = 0;
+  document.querySelectorAll('.m-qty').forEach((el,i)=>{
+    const hrg = document.querySelectorAll('.m-hrg')[i];
+    total += (parseNum(el.value))*(parseNum(hrg.value));
+  });
+  document.getElementById('modal-total').textContent = fmtRp(total);
+}
+function saveModal(){
+  const items = [];
+  document.querySelectorAll('.m-qty').forEach((el,i)=>{
+    const hrg = document.querySelectorAll('.m-hrg')[i];
+    items.push({qty:parseNum(el.value), harga:parseNum(hrg.value)});
+  });
+  state.modal = {items};
+  saveState();
+  showToast('✅ Modal awal tersimpan!');
+  renderDashboard();
+}
+function calcModalTotal(){
+  const d = getModalData();
+  if(!d.items) return MODAL_ITEMS.reduce((s,x)=>s+x.defQty*x.defHarga,0);
+  return d.items.reduce((s,x)=>s+(x.qty||0)*(x.harga||0),0);
+}
+
+// ═══════════════════════════════════════════════════════
+// PENGELUARAN
+// ═══════════════════════════════════════════════════════
+function renderPengeluaran(){
+  renderMonthTabs('month-pen', currentMonth, (m)=>{ currentMonth=m; renderPengeluaran(); });
+  document.getElementById('pen-title').textContent = 'Pengeluaran – '+MONTHS[currentMonth];
+  const saved = getPenData(currentMonth);
+  const container = document.getElementById('pen-items');
+  let html = '';
+  PEN_ITEMS.forEach((item,i)=>{
+    const qty   = saved.items[i] ? saved.items[i].qty   : item.defQty;
+    const harga = saved.items[i] ? saved.items[i].harga : item.defHarga;
+    html += `
+    <div class="form-row">
+      <label>${item.icon} ${item.name} [${item.unit}]</label>
+      <div class="inp-row">
+        <div class="inp-group"><span class="prefix">Qty</span><input type="number" class="p-qty" data-i="${i}" value="${qty}" min="0" oninput="recalcPen()"></div>
+        <div class="inp-group"><span class="prefix">Rp</span><input type="number" class="p-hrg" data-i="${i}" value="${harga}" min="0" oninput="recalcPen()"></div>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  recalcPen();
+}
+function recalcPen(){
+  let total = 0;
+  document.querySelectorAll('.p-qty').forEach((el,i)=>{
+    const hrg = document.querySelectorAll('.p-hrg')[i];
+    total += parseNum(el.value)*parseNum(hrg.value);
+  });
+  document.getElementById('pen-total').textContent = fmtRp(total);
+}
+function savePengeluaran(){
+  const items = [];
+  document.querySelectorAll('.p-qty').forEach((el,i)=>{
+    const hrg = document.querySelectorAll('.p-hrg')[i];
+    items.push({qty:parseNum(el.value), harga:parseNum(hrg.value)});
+  });
+  if(!state.pengeluaran) state.pengeluaran = {};
+  state.pengeluaran[currentMonth] = {items};
+  saveState();
+  showToast('✅ Pengeluaran '+MONTHS[currentMonth]+' tersimpan!');
+  renderDashboard();
+}
+function calcPenTotal(m){
+  const d = getPenData(m);
+  return (d.items||[]).reduce((s,x)=>s+(x.qty||0)*(x.harga||0),0);
+}
+
+// ═══════════════════════════════════════════════════════
+// PENJUALAN
+// ═══════════════════════════════════════════════════════
+function renderPenjualan(){
+  renderMonthTabs('month-jual', currentMonth, (m)=>{ currentMonth=m; renderPenjualan(); });
+  document.getElementById('jual-title').textContent = 'Penjualan – '+MONTHS[currentMonth];
+  const saved = getJualData(currentMonth);
+  const container = document.getElementById('jual-items');
+  let html = '';
+  JUAL_ITEMS.forEach((item,i)=>{
+    const qty   = saved.items[i] ? saved.items[i].qty   : item.defQty;
+    const harga = saved.items[i] ? saved.items[i].harga : item.defHarga;
+    html += `
+    <div class="form-row">
+      <label>${item.icon} ${item.name} [${item.unit}]</label>
+      <div class="inp-row">
+        <div class="inp-group"><span class="prefix">Qty</span><input type="number" class="j-qty" data-i="${i}" value="${qty}" min="0" oninput="recalcJual()"></div>
+        <div class="inp-group"><span class="prefix">Rp</span><input type="number" class="j-hrg" data-i="${i}" value="${harga}" min="0" oninput="recalcJual()"></div>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+  recalcJual();
+}
+function recalcJual(){
+  let total = 0;
+  document.querySelectorAll('.j-qty').forEach((el,i)=>{
+    const hrg = document.querySelectorAll('.j-hrg')[i];
+    total += parseNum(el.value)*parseNum(hrg.value);
+  });
+  document.getElementById('jual-total').textContent = fmtRp(total);
+}
+function savePenjualan(){
+  const items = [];
+  document.querySelectorAll('.j-qty').forEach((el,i)=>{
+    const hrg = document.querySelectorAll('.j-hrg')[i];
+    items.push({qty:parseNum(el.value), harga:parseNum(hrg.value)});
+  });
+  if(!state.penjualan) state.penjualan = {};
+  state.penjualan[currentMonth] = {items};
+  saveState();
+  showToast('✅ Penjualan '+MONTHS[currentMonth]+' tersimpan!');
+  renderDashboard();
+}
+function calcJualTotal(m){
+  const d = getJualData(m);
+  return (d.items||[]).reduce((s,x)=>s+(x.qty||0)*(x.harga||0),0);
+}
+
+// ═══════════════════════════════════════════════════════
+// MONTH TABS
+// ═══════════════════════════════════════════════════════
+function renderMonthTabs(containerId, active, onSelect){
+  const el = document.getElementById(containerId);
+  const SHORT = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+  el.innerHTML = SHORT.map((m,i)=>
+    `<button class="month-chip${i===active?' active':''}" onclick="(${onSelect.toString()})(${i});this.parentNode.querySelectorAll('.month-chip').forEach(b=>b.classList.remove('active'));this.classList.add('active')">${m}</button>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard(){
+  const modal  = calcModalTotal();
+  let totalPen = 0, totalJual = 0;
+  const tbody = document.getElementById('dash-tbody');
+  let rows = '';
+  for(let m=0;m<12;m++){
+    const pen  = calcPenTotal(m);
+    const jual = calcJualTotal(m);
+    totalPen  += pen;
+    totalJual += jual;
+    const laba = jual - pen;
+    const badge = laba>0
+      ? `<span class="badge badge-profit">✅ Untung</span>`
+      : laba<0
+      ? `<span class="badge badge-loss">❌ Rugi</span>`
+      : `<span class="badge badge-break">➡ Impas</span>`;
+    const short = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][m];
+    rows += `<tr>
+      <td>${short}</td>
+      <td class="td-money" style="color:var(--red)">${pen?fmtRp(pen):'-'}</td>
+      <td class="td-money" style="color:var(--green-mid)">${jual?fmtRp(jual):'-'}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }
+  tbody.innerHTML = rows;
+  document.getElementById('ft-jual').textContent = fmtRp(totalJual);
+
+  const labaBersih = totalJual - totalPen;
+  const roi = modal > 0 ? (labaBersih/modal*100) : 0;
+
+  document.getElementById('d-modal').textContent  = fmtRp(modal);
+  document.getElementById('d-jual').textContent   = fmtRp(totalJual);
+  document.getElementById('d-keluar').textContent = fmtRp(totalPen);
+  document.getElementById('d-laba').textContent   = fmtRp(labaBersih);
+  document.getElementById('d-roi').textContent    = roi.toFixed(1)+'%';
+
+  const chip = document.getElementById('d-chip-laba');
+  if(labaBersih>0){chip.classList.add('green');chip.classList.remove('red');}
+  else if(labaBersih<0){chip.classList.add('red');chip.classList.remove('green');}
+
+  const sub = labaBersih>=0
+    ? `Laba bersih Rp ${Math.abs(labaBersih).toLocaleString('id-ID')} dari modal`
+    : `Rugi Rp ${Math.abs(labaBersih).toLocaleString('id-ID')} dari modal`;
+  document.getElementById('d-roi-sub').textContent = sub;
+  const progress = Math.min(Math.max(roi,0),150)/150*100;
+  document.getElementById('d-progress').style.width = progress+'%';
+}
+
+// ═══════════════════════════════════════════════════════
+// GOOGLE DRIVE INTEGRATION
+// ═══════════════════════════════════════════════════════
+// NOTE: Untuk Google Drive nyata, ganti CLIENT_ID dengan milik Anda
+// dari https://console.cloud.google.com
+const DRIVE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+
+function handleDriveAuth(){
+  if(driveConnected){
+    openDriveSync('all');
+    return;
+  }
+  // Cek apakah CLIENT_ID sudah diisi
+  if(DRIVE_CLIENT_ID.includes('YOUR_GOOGLE')){
+    showDrivePlaceholder();
+    return;
+  }
+  // Google Identity Services OAuth flow
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: DRIVE_CLIENT_ID,
+    scope: DRIVE_SCOPE,
+    callback: (resp)=>{
+      if(resp.access_token){
+        driveAccessToken = resp.access_token;
+        driveConnected = true;
+        document.getElementById('driveBtn').classList.add('connected');
+        document.getElementById('driveBtnTxt').textContent = '✓ Drive';
+        showToast('✅ Google Drive terhubung!');
+      }
+    },
+  });
+  client.requestAccessToken();
+}
+
+function showDrivePlaceholder(){
+  const el = document.getElementById('drive-content');
+  el.innerHTML = `
+  <div style="text-align:center;padding:16px 0">
+    <div style="font-size:48px;margin-bottom:12px">☁️</div>
+    <h3 style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:8px">Setup Google Drive</h3>
+    <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px">
+      Untuk mengaktifkan sync Google Drive, Anda perlu membuat <b>Google Cloud Project</b> dan mendapatkan Client ID.
+    </p>
+  </div>
+  <div style="background:var(--green-pale);border-radius:12px;padding:14px;margin-bottom:14px">
+    <p style="font-size:12px;font-weight:700;color:var(--green-dark);margin-bottom:8px">📋 Langkah Setup:</p>
+    <ol style="font-size:12px;color:var(--text2);padding-left:16px;line-height:2">
+      <li>Buka <b>console.cloud.google.com</b></li>
+      <li>Buat project baru → Enable <b>Drive API</b></li>
+      <li>OAuth 2.0 → tambah domain Anda</li>
+      <li>Copy <b>Client ID</b></li>
+      <li>Ganti <code style="background:#fff;padding:2px 6px;border-radius:4px">YOUR_GOOGLE_CLIENT_ID</code> di kode</li>
+    </ol>
+  </div>
+  <div style="background:#fff3e0;border-radius:12px;padding:14px;margin-bottom:16px">
+    <p style="font-size:12px;color:#e67e22;font-weight:700">💡 Alternatif Simpan Sekarang</p>
+    <p style="font-size:12px;color:var(--text2);margin-top:4px">Data sudah tersimpan otomatis di <b>memori HP</b> (localStorage). Export ke file JSON untuk backup manual.</p>
+  </div>
+  <button class="btn btn-gold" onclick="exportJSON()" style="margin-bottom:8px">📥 Export Data ke File JSON</button>
+  <button class="btn btn-outline" onclick="triggerImport()">📤 Import Data dari File JSON</button>
+  <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(event)">
+  `;
+  document.getElementById('driveOverlay').classList.add('show');
+}
+
+function openDriveSync(type){
+  if(!driveConnected){
+    showDrivePlaceholder();
+    return;
+  }
+  const el = document.getElementById('drive-content');
+  el.innerHTML = `
+  <div class="drive-status ok">✅ Google Drive Terhubung</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <button class="btn btn-green" onclick="syncToDrive()">☁️ Simpan Semua Data ke Drive</button>
+    <button class="btn btn-outline" onclick="loadFromDrive()">📥 Muat Data dari Drive</button>
+  </div>
+  <div class="divider"></div>
+  <p style="font-size:12px;color:var(--text2)">File tersimpan sebagai <b>kenari_finance_data.json</b> di Google Drive Anda.</p>
+  `;
+  document.getElementById('driveOverlay').classList.add('show');
+}
+
+async function syncToDrive(){
+  if(!driveAccessToken){ showToast('❌ Hubungkan Drive dulu'); return; }
+  const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const formData = new FormData();
+  formData.append('metadata', new Blob([JSON.stringify({name:'kenari_finance_data.json',mimeType:'application/json'})],{type:'application/json'}));
+  formData.append('file', blob);
+  try{
+    const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
+      method:'POST', headers:{'Authorization':'Bearer '+driveAccessToken}, body:formData
+    });
+    if(r.ok){ showToast('✅ Data tersimpan ke Google Drive!'); closeDriveModal(); }
+    else{ showToast('❌ Gagal upload ke Drive'); }
+  }catch(e){ showToast('❌ Error: '+e.message); }
+}
+
+async function loadFromDrive(){
+  if(!driveAccessToken){ showToast('❌ Hubungkan Drive dulu'); return; }
+  try{
+    const r = await fetch("https://www.googleapis.com/drive/v3/files?q=name='kenari_finance_data.json'&fields=files(id,name)",{
+      headers:{'Authorization':'Bearer '+driveAccessToken}
+    });
+    const data = await r.json();
+    if(!data.files||!data.files.length){ showToast('⚠️ File tidak ditemukan di Drive'); return; }
+    const fileId = data.files[0].id;
+    const fr = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,{
+      headers:{'Authorization':'Bearer '+driveAccessToken}
+    });
+    const loaded = await fr.json();
+    state = loaded;
+    saveState();
+    renderDashboard();
+    showToast('✅ Data berhasil dimuat dari Drive!');
+    closeDriveModal();
+  }catch(e){ showToast('❌ Error: '+e.message); }
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT/IMPORT JSON (Backup Manual)
+// ═══════════════════════════════════════════════════════
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'kenari_finance_backup.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 File JSON berhasil di-download!');
+}
+function triggerImport(){ document.getElementById('import-file').click(); }
+function importJSON(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      state = JSON.parse(ev.target.result);
+      saveState(); renderDashboard();
+      showToast('✅ Data berhasil diimport!');
+      closeDriveModal();
+    }catch(err){ showToast('❌ File tidak valid'); }
+  };
+  reader.readAsText(file);
+}
+
+function closeDriveModal(e){
+  if(!e || e.target===document.getElementById('driveOverlay'))
+    document.getElementById('driveOverlay').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+loadState();
+renderDashboard();
+</script>
+
+<!-- Google Identity Services (untuk Drive OAuth) -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+</body>
+</html>
